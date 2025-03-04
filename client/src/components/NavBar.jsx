@@ -20,9 +20,20 @@ export default function NavBar({ loggedInUser, setLoggedInUser }) {
   return (
     <div>
       <Navbar color="light" fixed="top" expand="lg">
+        {/* Brand logo */}
         <NavbarBrand className="mr-auto" tag={RRNavLink} to="/">
           Personal Library
         </NavbarBrand>
+
+        {/* "My Library" Button on the right side */}
+        <Nav className="ml-auto" navbar>
+          <NavItem>
+            <NavLink tag={RRNavLink} to="/library">
+              <Button color="secondary">My Library</Button>
+            </NavLink>
+          </NavItem>
+        </Nav>
+
         {loggedInUser ? (
           <>
             <NavbarToggler onClick={toggleNavbar} />
