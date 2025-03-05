@@ -88,3 +88,25 @@ export const updateBook = async (bookId, updatedBook) => {
     throw error;
   }
 };
+
+export const createBook = async (bookData) => {
+  try {
+    const response = await fetch("/api/books", {
+      method: "POST",
+      credentials: "same-origin",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(bookData),
+    });
+
+    if (response.ok) {
+      return await response.json();
+    } else {
+      throw new Error("Failed to create book");
+    }
+  } catch (error) {
+    console.error("Error creating book:", error);
+    throw error;
+  }
+};

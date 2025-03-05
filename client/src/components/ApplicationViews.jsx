@@ -6,6 +6,7 @@ import Register from "./auth/Register";
 import { Library } from "./Library";
 import { BookDetails } from "./books/BookDetails";
 import { EditBook } from "./books/EditBook"; // Import the new EditBook component
+import { NewBook } from "./books/NewBook";
 
 export default function ApplicationViews({ loggedInUser, setLoggedInUser }) {
   return (
@@ -32,14 +33,9 @@ export default function ApplicationViews({ loggedInUser, setLoggedInUser }) {
           path="library"
           element={<Library loggedInUser={loggedInUser} />}
         />
-        <Route
-          path="book/:id" // Add the route for viewing book details
-          element={<BookDetails />}
-        />
-        <Route
-          path="edit-book/:bookId" // Add the route for editing the book
-          element={<EditBook />}
-        />
+        <Route path="book/:id" element={<BookDetails />} />
+        <Route path="edit-book/:bookId" element={<EditBook />} />
+        <Route path="new-book" element={<NewBook />} />
       </Route>
       <Route path="*" element={<p>Whoops, nothing here...</p>} />
     </Routes>
