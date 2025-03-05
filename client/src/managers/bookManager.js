@@ -70,7 +70,7 @@ export const updateBook = async (bookId, updatedBook) => {
     console.log("Updating book with data:", updatedBook); // Check the payload
 
     const response = await fetch(`${_apiUrl}/${bookId}`, {
-      method: "PUT", // Ensure it's a PUT request
+      method: "PUT",
       credentials: "same-origin",
       headers: {
         "Content-Type": "application/json",
@@ -79,6 +79,8 @@ export const updateBook = async (bookId, updatedBook) => {
     });
 
     if (!response.ok) {
+      const errorText = await response.text(); // Read the raw response text
+      console.error("Error response:", errorText); // Log the raw error response
       throw new Error("Failed to update the book");
     }
 

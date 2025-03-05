@@ -92,9 +92,9 @@ namespace PersonalLibrary.Data
             modelBuilder
                 .Entity<Author>()
                 .HasData(
-                    new Author { Id = 1, Name = "Isaac Asimov", Bio = "Author of science fiction and popular science." },
-                    new Author { Id = 2, Name = "J.K. Rowling", Bio = "Famous for writing the Harry Potter series." },
-                    new Author { Id = 3, Name = "Agatha Christie", Bio = "Known for her detective novels, particularly those featuring Hercule Poirot." }
+                    new Author { Id = 1, Name = "Isaac Asimov"},
+                    new Author { Id = 2, Name = "J.K. Rowling"},
+                    new Author { Id = 3, Name = "Agatha Christie"}
                 );
 
             // ----------------------------

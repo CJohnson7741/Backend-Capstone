@@ -13,7 +13,7 @@ export const EditBook = () => {
     condition: "New", // Set a default condition
     isbn: "", // Add the ISBN field to the state
     genreId: 1, // Set a default Genre ID
-    authors: [], // Array to store authors as objects with Id, Name, Bio
+    authors: [], // Array to store authors as objects with Id, Name
   });
   const [genres, setGenres] = useState([]); // State to hold genres
   const [authorInput, setAuthorInput] = useState(""); // State for the input field where authors are typed
@@ -67,9 +67,8 @@ export const EditBook = () => {
   const handleAddAuthor = () => {
     if (authorInput.trim() !== "") {
       const newAuthor = {
-        Id: 0, // New author ID is 0 since it doesn't exist yet
-        Name: authorInput.trim(),
-        Bio: "", // You could allow the user to add a bio if needed
+        id: 0, // New author ID is 0 since it doesn't exist yet
+        name: authorInput.trim(),
       };
 
       // Add author to the list if not empty
