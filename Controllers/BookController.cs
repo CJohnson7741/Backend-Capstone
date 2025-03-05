@@ -72,8 +72,7 @@ namespace PersonalLibrary.Controllers
                         // Create new author if they do not exist
                         author = new Author
                         {
-                            Name = authorDto.Name,
-                            Bio = authorDto.Bio
+                            Name = authorDto.Name
                         };
                         _context.Authors.Add(author);
                         await _context.SaveChangesAsync(); // Save to get the author's ID
@@ -114,124 +113,132 @@ namespace PersonalLibrary.Controllers
             return CreatedAtAction(nameof(GetBook), new { id = book.Id }, book);
         }
 
-        // PUT /api/books/{id}
+
         [HttpPut("{id}")]
         [Authorize]
         public async Task<IActionResult> UpdateBook(int id, [FromBody] BookDTO bookDto)
         {
-            // Get the current user's Id (logged-in user)
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-            if (string.IsNullOrEmpty(userId))
+            try
             {
-                return Unauthorized("User is not logged in.");
-            }
+                // Get the current user's Id (logged-in user)
+                var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            // Get the current user to retrieve the Username
-            var user = await _userManager.FindByIdAsync(userId);
-            if (user == null)
-            {
-                return Unauthorized("User profile not found.");
-            }
-
-            // Fetch user profile related to the logged-in user
-            var userProfile = await _context.UserProfiles
-                .FirstOrDefaultAsync(u => u.IdentityUserId == userId);
-
-            if (userProfile == null)
-            {
-                return Unauthorized("User profile not found.");
-            }
-
-            // Fetch the book associated with the logged-in user
-            var book = await _context.Books
-                .Where(b => b.UserProfileId == userProfile.Id && b.Id == id)
-                .FirstOrDefaultAsync();
-
-            if (book == null)
-            {
-                return NotFound("Book not found.");
-            }
-
-            // Create or find authors based on the DTOs passed
-            var authors = new List<Author>();
-            foreach (var authorDto in bookDto.Authors)
-            {
-                Author author;
-                if (authorDto.Id > 0)
+                if (string.IsNullOrEmpty(userId))
                 {
-                    // If an AuthorId is provided, check if the author exists in the database
-                    author = await _context.Authors
-                        .FirstOrDefaultAsync(a => a.Id == authorDto.Id);
-
-                    if (author == null)
-                    {
-                        return NotFound($"Author with Id {authorDto.Id} not found.");
-                    }
+                    return Unauthorized("User is not logged in.");
                 }
-                else
-                {
-                    // If no Id is provided, create a new author
-                    author = await _context.Authors
-                        .FirstOrDefaultAsync(a => a.Name == authorDto.Name);
 
-                    if (author == null)
+                var user = await _userManager.FindByIdAsync(userId);
+                if (user == null)
+                {
+                    return Unauthorized("User profile not found.");
+                }
+
+                var userProfile = await _context.UserProfiles
+                    .FirstOrDefaultAsync(u => u.IdentityUserId == userId);
+
+                if (userProfile == null)
+                {
+                    return Unauthorized("User profile not found.");
+                }
+
+                var book = await _context.Books
+                    .Where(b => b.UserProfileId == userProfile.Id && b.Id == id)
+                    .FirstOrDefaultAsync();
+
+                if (book == null)
+                {
+                    return NotFound("Book not found.");
+                }
+
+                // Ensure authors are either fetched from the database or created and saved
+                var authors = new List<Author>();
+                foreach (var authorDto in bookDto.Authors ?? new List<AuthorDTO>())
+                {
+                    Author author;
+
+                    if (authorDto.Id > 0)
                     {
-                        // Create new author if they do not exist
-                        author = new Author
+                        // Fetch existing author
+                        author = await _context.Authors
+                            .FirstOrDefaultAsync(a => a.Id == authorDto.Id);
+
+                        if (author == null)
                         {
-                            Name = authorDto.Name,
-                            Bio = authorDto.Bio
-                        };
-                        _context.Authors.Add(author);
+                            return NotFound($"Author with Id {authorDto.Id} not found.");
+                        }
                     }
+                    else
+                    {
+                        // Check if author already exists by name
+                        author = await _context.Authors
+                            .FirstOrDefaultAsync(a => a.Name == authorDto.Name);
+
+                        if (author == null)
+                        {
+                            // Create new author if they don't exist
+                            author = new Author
+                            {
+                                Name = authorDto.Name
+                            };
+                            _context.Authors.Add(author);
+                            await _context.SaveChangesAsync();  // Save to get the ID
+                        }
+                    }
+
+                    authors.Add(author);
                 }
 
-                authors.Add(author);
-            }
+                // Update the book's properties
+                book.Title = bookDto.Title;
+                book.Description = bookDto.Description;
+                book.Condition = bookDto.Condition;
+                book.ISBN = bookDto.ISBN;
+                book.GenreId = bookDto.GenreId;
 
-            // Update book details
-            book.Title = bookDto.Title;
-            book.Description = bookDto.Description;
-            book.Condition = bookDto.Condition;
-            book.ISBN = bookDto.ISBN;
-            book.GenreId = bookDto.GenreId;
+                // Get the current book authors in the database
+                var existingBookAuthors = await _context.BookAuthors
+                    .Where(ba => ba.BookId == book.Id)
+                    .ToListAsync();
 
-            // Remove existing BookAuthors relationships
-            var existingBookAuthors = await _context.BookAuthors
-                .Where(ba => ba.BookId == book.Id)
-                .ToListAsync();
+                // Determine authors to remove and add
+                var authorsToRemove = existingBookAuthors
+                    .Where(ba => !authors.Any(a => a.Id == ba.AuthorId))
+                    .ToList();
 
-            // Find the authors to remove (authors that are not in the new list)
-            var authorsToRemove = existingBookAuthors
-                .Where(ba => !authors.Any(a => a.Id == ba.AuthorId))
-                .ToList();
+                var authorsToAdd = authors
+                    .Where(a => !existingBookAuthors.Any(ba => ba.AuthorId == a.Id))
+                    .ToList();
 
-            // Find authors to add (authors that are not already linked to the book)
-            var authorsToAdd = authors
-                .Where(a => !existingBookAuthors.Any(ba => ba.AuthorId == a.Id))
-                .ToList();
+                // Remove the authors that are no longer associated with the book
+                _context.BookAuthors.RemoveRange(authorsToRemove);
 
-            // Remove the BookAuthors that are no longer needed
-            _context.BookAuthors.RemoveRange(authorsToRemove);
-
-            // Add the new BookAuthors relationships
-            foreach (var author in authorsToAdd)
-            {
-                var bookAuthor = new BookAuthor
+                // Add new author relationships
+                foreach (var author in authorsToAdd)
                 {
-                    BookId = book.Id,
-                    AuthorId = author.Id
-                };
+                    var bookAuthor = new BookAuthor
+                    {
+                        BookId = book.Id,
+                        AuthorId = author.Id
+                    };
 
-                _context.BookAuthors.Add(bookAuthor);
+                    _context.BookAuthors.Add(bookAuthor);
+                }
+
+                // Save all changes
+                await _context.SaveChangesAsync();
+
+                return Ok(book);
             }
-
-            // Save changes in a single transaction
-            await _context.SaveChangesAsync(); 
-
-            return Ok(book); // Return the updated book
+            catch (Exception ex)
+            {
+                // Log the exception and return a proper error response
+                Console.WriteLine($"Error in UpdateBook API: {ex.Message}");
+                return StatusCode(500, "An error occurred while updating the book.");
+            }
         }
+
+
 
         // DELETE /api/books/{id}
         [HttpDelete("{id}")]
@@ -313,7 +320,7 @@ namespace PersonalLibrary.Controllers
                 GenreName = genre?.Name, // Ensure the GenreName is included
                 Description = book.Description,
                 Condition = book.Condition,
-                Authors = authors.Select(a => new AuthorDTO { Id = a.Id, Name = a.Name, Bio = a.Bio }).ToList()
+                Authors = authors.Select(a => new AuthorDTO { Id = a.Id, Name = a.Name}).ToList()
             };
 
             return Ok(bookDto);
@@ -357,7 +364,6 @@ namespace PersonalLibrary.Controllers
                         {
                             Id = a.Id,
                             Name = a.Name,
-                            Bio = a.Bio
                         }).ToList()
                 })
                 .ToListAsync();

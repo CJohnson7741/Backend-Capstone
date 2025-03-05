@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using PersonalLibrary.Data;
@@ -11,9 +12,11 @@ using PersonalLibrary.Data;
 namespace PersonalLibrary.Migrations
 {
     [DbContext(typeof(PersonalLibraryDbContext))]
-    partial class PersonalLibraryDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250305163718_UpdatingAuthorSchema")]
+    partial class UpdatingAuthorSchema
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -141,13 +144,13 @@ namespace PersonalLibrary.Migrations
                         {
                             Id = "1",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "c86aa4f4-8ef1-4d54-9f05-4334db0606bf",
+                            ConcurrencyStamp = "43b7d3c5-2a9a-4010-b2a8-9d2a55e5fbdb",
                             Email = "admin@library.com",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
-                            PasswordHash = "AQAAAAIAAYagAAAAELbjcx9NisBG4AkJzCVSvAswjb5UjMVYxg/SJ2yLqzVVcdBT+KwN/AdpNsQ7uAgpUw==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEDNe0WO+eshBX6wLg/o8j48cZrJCv0L6cWLwuNtqNU2yNqS2NrmhoN7dZv5pHUKIkw==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "9dd943d7-8c4c-4758-941f-288f8800d7f9",
+                            SecurityStamp = "7d342d5e-8c37-4ed4-bc0c-8a194cc5480f",
                             TwoFactorEnabled = false,
                             UserName = "adminuser"
                         },
@@ -155,13 +158,13 @@ namespace PersonalLibrary.Migrations
                         {
                             Id = "2",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "8bd8d174-7262-4d67-85d8-c930fb7b37ac",
+                            ConcurrencyStamp = "db5bc37e-f64f-4bde-abde-cc68dcfb974c",
                             Email = "user2@library.com",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
-                            PasswordHash = "AQAAAAIAAYagAAAAEE1FalKRZqzLk9MTcfkQbM1hQEC8foHUSipov2fIBY4cbPtTMuWawjoDioLQE3eRQw==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEJHfZxelkqIWlMCuw17qTVtaRbWk//i9VzK1uo11VVyrUMU6y7MkN5MYnaZ5AZaYVA==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "5fccbe5b-1589-41f8-a8dd-445b8784b99a",
+                            SecurityStamp = "2c898529-a0a6-44b5-ac94-32a430bdeece",
                             TwoFactorEnabled = false,
                             UserName = "user2"
                         });
@@ -256,6 +259,10 @@ namespace PersonalLibrary.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("Bio")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
@@ -268,16 +275,19 @@ namespace PersonalLibrary.Migrations
                         new
                         {
                             Id = 1,
+                            Bio = "Author of science fiction and popular science.",
                             Name = "Isaac Asimov"
                         },
                         new
                         {
                             Id = 2,
+                            Bio = "Famous for writing the Harry Potter series.",
                             Name = "J.K. Rowling"
                         },
                         new
                         {
                             Id = 3,
+                            Bio = "Known for her detective novels, particularly those featuring Hercule Poirot.",
                             Name = "Agatha Christie"
                         });
                 });

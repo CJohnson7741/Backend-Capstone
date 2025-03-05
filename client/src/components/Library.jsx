@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { fetchBooks, deleteBook } from "../managers/bookManager";
 import { BookCard } from "./books/bookCard";
 import "./Library.css";
+import { Row } from "reactstrap";
 
 export const Library = ({ loggedInUser }) => {
   const [books, setBooks] = useState([]); // Holds all books
@@ -66,7 +67,7 @@ export const Library = ({ loggedInUser }) => {
 
   // Render the component
   return (
-    <div className="library-container">
+    <div className="library-container w-screen">
       <h2>Your Library</h2>
 
       {/* Search bar */}
@@ -88,11 +89,15 @@ export const Library = ({ loggedInUser }) => {
       {filteredBooks.length === 0 ? (
         <p>No books found for your search!</p>
       ) : (
-        <div className="book-cards-container">
+        // <div className="book-cards-container">
+        <>
           {filteredBooks.map((book) => (
-            <BookCard key={book.id} book={book} onDelete={handleDeleteBook} />
+            <Row className="my-2">
+              <BookCard key={book.id} book={book} onDelete={handleDeleteBook} />
+            </Row>
           ))}
-        </div>
+        </>
+        // </div>
       )}
     </div>
   );
