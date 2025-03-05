@@ -1,0 +1,102 @@
+/* NewBook.css */
+
+.new-book-container {
+  width: 80%;
+  max-width: 900px;
+  margin: 50px auto;
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.new-book-container h2 {
+  text-align: center;
+  font-size: 2rem;
+  margin-bottom: 20px;
+}
+
+.new-book-container form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.new-book-container label {
+  font-size: 1rem;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.new-book-container input,
+.new-book-container textarea,
+.new-book-container select {
+  padding: 10px;
+  font-size: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  outline: none;
+}
+
+.new-book-container input:focus,
+.new-book-container textarea:focus,
+.new-book-container select:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+.new-book-container textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+.new-book-container button {
+  background-color: #007bff;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.new-book-container button:hover {
+  background-color: #0056b3;
+}
+
+.new-book-container .author-list {
+  margin-top: 10px;
+  padding: 10px;
+  background-color: #f9f9f9;
+  border-radius: 5px;
+}
+
+.new-book-container .author-list h4 {
+  margin-top: 0;
+}
+
+.new-book-container .author-list ul {
+  list-style: none;
+  padding: 0;
+}
+
+.new-book-container .author-list ul li {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.new-book-container .author-list ul li button {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  padding: 5px;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 0.875rem;
+}
+
+.new-book-container .author-list ul li button:hover {
+  background-color: #c82333;
+}
