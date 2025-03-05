@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using PersonalLibrary.Data;
@@ -11,9 +12,11 @@ using PersonalLibrary.Data;
 namespace PersonalLibrary.Migrations
 {
     [DbContext(typeof(PersonalLibraryDbContext))]
-    partial class PersonalLibraryDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250304171105_AddDescriptionAndConditionToBook")]
+    partial class AddDescriptionAndConditionToBook
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -141,13 +144,13 @@ namespace PersonalLibrary.Migrations
                         {
                             Id = "1",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "ce6848f6-a781-4529-87a0-1cd03293d8e5",
+                            ConcurrencyStamp = "6813f658-a063-4807-a432-a764e68ad04f",
                             Email = "admin@library.com",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
-                            PasswordHash = "AQAAAAIAAYagAAAAEM+9GLWSeD/MafQLKsJPViaoqkLRy28OwB2aD51asmHsjSeL0uqfH2jLAyeLsOSvnQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEJQstOD4C2nGULgua3RsWlnAs0reqWVVVoEf58OnDPOGOCWRzfKyuI5IdHPvGznR0A==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "98ed28d8-e1ca-412d-ac34-a05c935afde6",
+                            SecurityStamp = "13437ca9-a251-47e7-8131-6f62d41852f1",
                             TwoFactorEnabled = false,
                             UserName = "adminuser"
                         },
@@ -155,13 +158,13 @@ namespace PersonalLibrary.Migrations
                         {
                             Id = "2",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "efd2d662-ab41-4251-8e81-81dde144d30e",
+                            ConcurrencyStamp = "902969db-54ea-424c-b405-b89f6e8bcc9d",
                             Email = "user2@library.com",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
-                            PasswordHash = "AQAAAAIAAYagAAAAEGKdLk/NVnx+xuQ3IjSQxIomi9r6vqnqe9uo7rTsHqezOHo5mt+1rrfW0gvrUuquOQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAED42ZI1GwZFdLe12Uojyy2fKqvVUik6WXQECHbS8/4lx2vbj9OKG/WM2iK9XPcGV5A==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "a2823fea-1aba-4474-9035-7347cd06d1f3",
+                            SecurityStamp = "576cb768-c52f-4184-95dd-cddbb0a56fe5",
                             TwoFactorEnabled = false,
                             UserName = "user2"
                         });
@@ -297,14 +300,6 @@ namespace PersonalLibrary.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("Condition")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("text");
-
                     b.Property<int>("GenreId")
                         .HasColumnType("integer");
 
@@ -331,8 +326,6 @@ namespace PersonalLibrary.Migrations
                         new
                         {
                             Id = 1,
-                            Condition = "New",
-                            Description = "A science fiction novel about the fall of the Galactic Empire.",
                             GenreId = 1,
                             ISBN = "978-0-553-80371-0",
                             Title = "Foundation",
@@ -341,8 +334,6 @@ namespace PersonalLibrary.Migrations
                         new
                         {
                             Id = 2,
-                            Condition = "Good",
-                            Description = "A young wizard's journey begins at Hogwarts School of Witchcraft and Wizardry.",
                             GenreId = 2,
                             ISBN = "978-0-590-35340-3",
                             Title = "Harry Potter and the Sorcerer's Stone",
@@ -351,8 +342,6 @@ namespace PersonalLibrary.Migrations
                         new
                         {
                             Id = 3,
-                            Condition = "Worn",
-                            Description = "A detective story featuring Hercule Poirot solving a murder mystery on a train.",
                             GenreId = 3,
                             ISBN = "978-0-06-269366-2",
                             Title = "Murder on the Orient Express",
@@ -361,8 +350,6 @@ namespace PersonalLibrary.Migrations
                         new
                         {
                             Id = 4,
-                            Condition = "Fair",
-                            Description = "A fantasy novel about a hobbit's adventures in Middle-earth.",
                             GenreId = 2,
                             ISBN = "978-0-618-00221-3",
                             Title = "The Hobbit",

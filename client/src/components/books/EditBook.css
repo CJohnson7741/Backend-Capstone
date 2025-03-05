@@ -1,0 +1,76 @@
+/* Container for the Edit Book form */
+.edit-book-container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Title for the form */
+.edit-book-container h2 {
+  font-size: 2rem;
+  margin-bottom: 20px;
+  text-align: center;
+  color: #333;
+}
+
+/* Label for each input field */
+.edit-book-container label {
+  display: block;
+  font-size: 1.1rem;
+  margin-bottom: 8px;
+  color: #555;
+}
+
+/* Styling for input fields and text areas */
+.edit-book-container input,
+.edit-book-container select,
+.edit-book-container textarea {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 1rem;
+  color: #333;
+}
+
+.edit-book-container textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+/* Button for saving changes */
+.edit-book-container button {
+  padding: 12px 20px;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  width: 100%;
+}
+
+.edit-book-container button:hover {
+  background-color: #45a049;
+}
+
+/* Button for canceling */
+.cancel-button {
+  padding: 12px 20px;
+  background-color: #f44336;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 1.1rem;
+  cursor: pointer;
+  width: 100%;
+  margin-top: 10px;
+}
+
+.cancel-button:hover {
+  background-color: #e53935;
+}

@@ -1,3 +1,4 @@
+// BookDetails.js
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { fetchBookById, deleteBook } from "../../managers/bookManager";
@@ -37,6 +38,10 @@ export const BookDetails = () => {
     }
   };
 
+  const handleEdit = () => {
+    navigate(`/edit-book/${id}`);
+  };
+
   if (!book) {
     return <p>Loading book details...</p>;
   }
@@ -56,11 +61,17 @@ export const BookDetails = () => {
       </p>
       <p>
         <strong>Description:</strong> {book.description}
-      </p>{" "}
+      </p>
       <p>
         <strong>Condition:</strong> {book.condition}
-      </p>{" "}
+      </p>
       {/* Book Condition displayed as read-only */}
+
+      {/* Edit Button */}
+      <button className="edit-button" onClick={handleEdit}>
+        Edit Book
+      </button>
+
       {/* Delete Button */}
       <button className="delete-button" onClick={handleDelete}>
         Delete Book

@@ -64,3 +64,27 @@ export const fetchBookById = async (bookId) => {
     throw error;
   }
 };
+
+export const updateBook = async (bookId, updatedBook) => {
+  try {
+    console.log("Updating book with data:", updatedBook); // Check the payload
+
+    const response = await fetch(`${_apiUrl}/${bookId}`, {
+      method: "PUT", // Ensure it's a PUT request
+      credentials: "same-origin",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(updatedBook),
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to update the book");
+    }
+
+    return await response.json(); // Return updated book data
+  } catch (error) {
+    console.error("Error updating book:", error);
+    throw error;
+  }
+};
