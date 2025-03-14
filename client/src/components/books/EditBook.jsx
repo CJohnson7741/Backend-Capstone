@@ -91,17 +91,16 @@ export const EditBook = () => {
 
     if (isConfirmed) {
       try {
-        // Add genreName here if required by backend
-        const selectedGenre = genres.find((genre) => genre.id === book.genreId); // Assuming you have a genres list
+        const selectedGenre = genres.find((genre) => genre.id === book.genreId);
         const updatedBook = await updateBook(bookId, {
           ...book,
-          genreName: selectedGenre ? selectedGenre.name : "", // Add genreName
-          authors: authorsList, // Include the list of authors (as objects) in the update
+          genreName: selectedGenre ? selectedGenre.name : "",
+          authors: authorsList,
         });
 
         if (updatedBook) {
           // Only redirect if the book was successfully updated
-          navigate(`/book/${bookId}`); // Redirect to the book details page after update
+          navigate(`/book/${bookId}`);
         } else {
           alert("Failed to update book");
         }
