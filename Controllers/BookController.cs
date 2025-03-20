@@ -9,6 +9,8 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using System.Collections.Generic;
+using System.Net.Http;
+using System.Text.Json;  // Required for System.Text.Json
 
 namespace PersonalLibrary.Controllers
 {
@@ -90,7 +92,8 @@ namespace PersonalLibrary.Controllers
                 GenreId = bookDto.GenreId,
                 UserProfileId = userProfile.Id,
                 Description = bookDto.Description,
-                Condition = bookDto.Condition
+                Condition = bookDto.Condition,
+                ImageUrl = bookDto.ImageUrl
             };
 
             _context.Books.Add(book);
@@ -113,7 +116,7 @@ namespace PersonalLibrary.Controllers
             return CreatedAtAction(nameof(GetBook), new { id = book.Id }, book);
         }
 
-
+        // PUT /api/books/{id}
         [HttpPut("{id}")]
         [Authorize]
         public async Task<IActionResult> UpdateBook(int id, [FromBody] BookDTO bookDto)
@@ -238,8 +241,6 @@ namespace PersonalLibrary.Controllers
             }
         }
 
-
-
         // DELETE /api/books/{id}
         [HttpDelete("{id}")]
         [Authorize]
@@ -275,7 +276,7 @@ namespace PersonalLibrary.Controllers
             return NoContent(); // Success, no content to return
         }
 
-        // Get book by ID
+        // GET /api/books/{id}
         [HttpGet("{id}")]
         [Authorize]
         public async Task<IActionResult> GetBook(int id)
@@ -320,7 +321,8 @@ namespace PersonalLibrary.Controllers
                 GenreName = genre?.Name, // Ensure the GenreName is included
                 Description = book.Description,
                 Condition = book.Condition,
-                Authors = authors.Select(a => new AuthorDTO { Id = a.Id, Name = a.Name}).ToList()
+                Authors = authors.Select(a => new AuthorDTO { Id = a.Id, Name = a.Name }).ToList(),
+                ImageUrl = book.ImageUrl // Include image URL in response
             };
 
             return Ok(bookDto);
@@ -364,11 +366,70 @@ namespace PersonalLibrary.Controllers
                         {
                             Id = a.Id,
                             Name = a.Name,
-                        }).ToList()
+                        }).ToList(),
+                    ImageUrl = b.ImageUrl // Include image URL in the response
                 })
                 .ToListAsync();
 
             return Ok(books);
         }
+
+        [HttpGet("isbn/{isbn}")]
+        public async Task<IActionResult> GetBookByISBN(string isbn)
+        {
+            string apiKey = "AIzaSyDGXvTPLdVgSFzI4_98J5BPTVZbVEtCg7o";  // Replace with your API key
+            string url = $"https://www.googleapis.com/books/v1/volumes?q=isbn:{isbn}&key={apiKey}";
+
+            try
+            {
+                using (var client = new HttpClient())
+                {
+                    // Make the request to the Google Books API
+                    var response = await client.GetAsync(url);
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var jsonResponse = await response.Content.ReadAsStringAsync();
+
+                        // Deserialize only the necessary parts of the response
+                        var googleBooksResponse = JsonSerializer.Deserialize<GoogleBooksResponse>(jsonResponse);
+
+                        if (googleBooksResponse != null && googleBooksResponse.TotalItems > 0)
+                        {
+                            var bookInfo = googleBooksResponse.Items.FirstOrDefault()?.VolumeInfo;
+
+                            if (bookInfo != null)
+                            {
+                                var bookDto = new BookDTO
+                                {
+                                    Title = bookInfo.Title,
+                                    ISBN = isbn,
+                                    Description = bookInfo.Description ?? "No description available",
+                                    GenreName = bookInfo.Categories?.FirstOrDefault() ?? "Unknown",  // Default genre if not available
+                                    Condition = "Unknown",  // Default condition
+                                    Authors = bookInfo.Authors?.Select(a => new AuthorDTO { Name = a }).ToList() ?? new List<AuthorDTO> { new AuthorDTO { Name = "Unknown Author" } },
+                                    ImageUrl = bookInfo.ImageLinks?.Thumbnail // Extract the thumbnail image URL
+                                };
+
+                                return Ok(bookDto);
+                            }
+                        }
+
+                        return NotFound("No books found with the provided ISBN.");
+                    }
+
+                    return StatusCode(500, "Error calling the Google Books API. Please try again later.");
+                }
+            }
+            catch (HttpRequestException ex)
+            {
+                return StatusCode(500, $"Error while making the request: {ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"An unexpected error occurred: {ex.Message}");
+            }
+        }
     }
 }
+
+

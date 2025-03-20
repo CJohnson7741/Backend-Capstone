@@ -9,21 +9,22 @@ export const NewBook = () => {
   const [book, setBook] = useState({
     title: "",
     description: "",
-    condition: "New", // Set a default condition
-    isbn: "", // Add the ISBN field to the state
-    genreId: 1, // Set a default Genre ID
-    authors: [], // Array to store authors as objects with Id, Name
+    condition: "New",
+    isbn: "",
+    genreId: 1,
+    authors: [],
+    imageUrl: "", // Add imageUrl field
   });
-  const [genres, setGenres] = useState([]); // State to hold genres
-  const [authorInput, setAuthorInput] = useState(""); // State for the input field where authors are typed
-  const [authorsList, setAuthorsList] = useState([]); // State to hold the list of authors added
+  const [genres, setGenres] = useState([]);
+  const [authorInput, setAuthorInput] = useState("");
+  const [authorsList, setAuthorsList] = useState([]);
 
   useEffect(() => {
     // Load the genres
     const loadGenres = async () => {
       try {
-        const genreData = await fetchGenres(); // Fetch genres using the genreManager
-        setGenres(genreData); // Set genres to state
+        const genreData = await fetchGenres();
+        setGenres(genreData);
       } catch (error) {
         console.error("Error fetching genres:", error);
       }
@@ -51,7 +52,6 @@ export const NewBook = () => {
         Name: authorInput.trim(),
       };
 
-      // Add author to the list if not empty
       setAuthorsList((prevAuthors) => [...prevAuthors, newAuthor]);
       setAuthorInput(""); // Clear the input field after adding
     }
@@ -59,6 +59,62 @@ export const NewBook = () => {
 
   const handleRemoveAuthor = (author) => {
     setAuthorsList((prevAuthors) => prevAuthors.filter((a) => a !== author));
+  };
+
+  const fetchBookByISBN = async (isbn) => {
+    try {
+      const response = await fetch(
+        `https://www.googleapis.com/books/v1/volumes?q=isbn:${isbn}`,
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (response.ok) {
+        const data = await response.json();
+        if (data.totalItems > 0) {
+          const bookData = data.items[0].volumeInfo;
+          const imageUrl = bookData.imageLinks
+            ? bookData.imageLinks.thumbnail
+            : null;
+
+          // Populate the form with the fetched data
+          setBook({
+            ...book,
+            title: bookData.title,
+            description: bookData.description,
+            condition: "New", // Set default condition
+            isbn: isbn,
+          });
+
+          // Set authors list
+          setAuthorsList(
+            bookData.authors.map((author) => ({
+              Id: 0, // Default ID for authors from Google Books API
+              Name: author,
+            }))
+          );
+
+          // Set the image URL if available
+          if (imageUrl) {
+            setBook((prevBook) => ({
+              ...prevBook,
+              imageUrl: imageUrl, // Add image URL to state
+            }));
+          }
+        } else {
+          alert("No book found with this ISBN.");
+        }
+      } else {
+        alert("Error fetching book data.");
+      }
+    } catch (error) {
+      console.error("Error fetching book by ISBN:", error);
+      alert("An error occurred while fetching the book data.");
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -71,16 +127,15 @@ export const NewBook = () => {
 
     if (isConfirmed) {
       try {
-        // Add genreName here if required by backend
-        const selectedGenre = genres.find((genre) => genre.id === book.genreId); // Assuming you have a genres list
+        const selectedGenre = genres.find((genre) => genre.id === book.genreId);
         const newBook = await createBook({
           ...book,
-          genreName: selectedGenre ? selectedGenre.name : "", // Add genreName
-          authors: authorsList, // Include the list of authors (as objects) in the create
+          genreName: selectedGenre ? selectedGenre.name : "",
+          authors: authorsList,
+          imageUrl: book.imageUrl, // Include imageUrl when creating the book
         });
 
         if (newBook) {
-          // Only redirect if the book was successfully created
           navigate(`/book/${newBook.id}`); // Redirect to the book details page after creation
         } else {
           alert("Failed to add book");
@@ -93,7 +148,7 @@ export const NewBook = () => {
   };
 
   return (
-    <div className="new-book-container">
+    <div className="new-book-container mt-5 text-start">
       <h2>Add New Book</h2>
       <form onSubmit={handleSubmit}>
         <div>
@@ -118,6 +173,13 @@ export const NewBook = () => {
             onChange={handleInputChange}
             required
           />
+          <button
+            type="button"
+            className="btn"
+            onClick={() => fetchBookByISBN(book.isbn)}
+          >
+            Fetch Book Data
+          </button>
         </div>
 
         <div>
@@ -168,6 +230,25 @@ export const NewBook = () => {
           </select>
         </div>
 
+        {/* Image Section */}
+        <div>
+          <label htmlFor="imageUrl">Image URL</label>
+          <input
+            type="text"
+            id="imageUrl"
+            name="imageUrl"
+            value={book.imageUrl}
+            onChange={handleInputChange}
+            placeholder="Enter image URL"
+          />
+          {book.imageUrl && (
+            <div>
+              <h4>Current Image:</h4>
+              <img src={book.imageUrl} alt="Book" style={{ width: "100px" }} />
+            </div>
+          )}
+        </div>
+
         {/* Authors Section */}
         <div>
           <label htmlFor="authors">Authors</label>
@@ -199,7 +280,7 @@ export const NewBook = () => {
                   </li>
                 ))
               ) : (
-                <p>No authors added yet.</p> // Optionally handle empty authors list
+                <p>No authors added yet.</p>
               )}
             </ul>
           </div>
