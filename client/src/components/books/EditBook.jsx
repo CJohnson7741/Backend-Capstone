@@ -10,17 +10,17 @@ export const EditBook = () => {
   const [book, setBook] = useState({
     title: "",
     description: "",
-    condition: "New", // Set a default condition
-    isbn: "", // Add the ISBN field to the state
-    genreId: 1, // Set a default Genre ID
-    authors: [], // Array to store authors as objects with Id, Name
+    condition: "New",
+    isbn: "",
+    genreId: 1,
+    authors: [],
+    imageUrl: "", // Add imageUrl field
   });
-  const [genres, setGenres] = useState([]); // State to hold genres
-  const [authorInput, setAuthorInput] = useState(""); // State for the input field where authors are typed
-  const [authorsList, setAuthorsList] = useState([]); // State to hold the list of authors added
+  const [genres, setGenres] = useState([]);
+  const [authorInput, setAuthorInput] = useState("");
+  const [authorsList, setAuthorsList] = useState([]);
 
   useEffect(() => {
-    // Load the book details
     const loadBook = async () => {
       try {
         const bookData = await fetchBookById(bookId);
@@ -28,21 +28,21 @@ export const EditBook = () => {
           title: bookData.title,
           description: bookData.description || "",
           condition: bookData.condition || "New",
-          isbn: bookData.isbn || "", // Load the ISBN
-          genreId: bookData.genreId || 1, // Load the Genre ID
-          authors: bookData.authors || [], // Assuming authors are part of the book data
+          isbn: bookData.isbn || "",
+          genreId: bookData.genreId || 1,
+          authors: bookData.authors || [],
+          imageUrl: bookData.imageUrl || "", // Load the imageUrl
         });
-        setAuthorsList(bookData.authors || []); // Set the list of authors from the book data
+        setAuthorsList(bookData.authors || []);
       } catch (error) {
         console.error("Error fetching book details:", error);
       }
     };
 
-    // Load the genres
     const loadGenres = async () => {
       try {
-        const genreData = await fetchGenres(); // Fetch genres using the genreManager
-        setGenres(genreData); // Set genres to state
+        const genreData = await fetchGenres();
+        setGenres(genreData);
       } catch (error) {
         console.error("Error fetching genres:", error);
       }
@@ -67,13 +67,12 @@ export const EditBook = () => {
   const handleAddAuthor = () => {
     if (authorInput.trim() !== "") {
       const newAuthor = {
-        id: 0, // New author ID is 0 since it doesn't exist yet
+        id: 0,
         name: authorInput.trim(),
       };
 
-      // Add author to the list if not empty
       setAuthorsList((prevAuthors) => [...prevAuthors, newAuthor]);
-      setAuthorInput(""); // Clear the input field after adding
+      setAuthorInput("");
     }
   };
 
@@ -84,7 +83,6 @@ export const EditBook = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Show confirmation dialog
     const isConfirmed = window.confirm(
       "Are you sure you want to save these changes?"
     );
@@ -99,7 +97,6 @@ export const EditBook = () => {
         });
 
         if (updatedBook) {
-          // Only redirect if the book was successfully updated
           navigate(`/book/${bookId}`);
         } else {
           alert("Failed to update book");
@@ -112,9 +109,27 @@ export const EditBook = () => {
   };
 
   return (
-    <div className="edit-book-container">
+    <div className="edit-book-container mt-5">
       <h2>Edit Book</h2>
       <form onSubmit={handleSubmit}>
+        {/* Image Section */}
+        <div>
+          <label htmlFor="imageUrl">Image URL</label>
+          <input
+            type="text"
+            id="imageUrl"
+            name="imageUrl"
+            value={book.imageUrl}
+            onChange={handleInputChange}
+            placeholder="Enter image URL"
+          />
+          {book.imageUrl && (
+            <div>
+              <h4>Current Image:</h4>
+              <img src={book.imageUrl} alt="Book" style={{ width: "100px" }} />
+            </div>
+          )}
+        </div>
         <div>
           <label htmlFor="title">Title</label>
           <input
@@ -204,7 +219,6 @@ export const EditBook = () => {
                 authorsList.map((author, index) => (
                   <li key={index}>
                     {author.name}{" "}
-                    {/* Ensure this matches the property of the author object */}
                     <button
                       type="button"
                       onClick={() => handleRemoveAuthor(author)}
@@ -214,7 +228,7 @@ export const EditBook = () => {
                   </li>
                 ))
               ) : (
-                <p>No authors added yet.</p> // Optionally handle empty authors list
+                <p>No authors added yet.</p>
               )}
             </ul>
           </div>

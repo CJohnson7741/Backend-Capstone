@@ -6,11 +6,23 @@ using PersonalLibrary.Data;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
 builder.Services.AddControllers().AddJsonOptions(opts =>
 {
     opts.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
 });
+
+// Add CORS policy to allow frontend origin
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontendOrigin", policy =>
+    {
+        policy.WithOrigins("http://localhost:5173", "http://localhost:5000") // Frontend URL (adjust port if needed)
+              .AllowAnyMethod()
+              .AllowAnyHeader()
+              .AllowCredentials(); // If needed, allow credentials (cookies/authentication)
+    });
+});
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -20,7 +32,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     {
         options.Cookie.Name = "PersonalLibraryLoginCookie";
         options.Cookie.SameSite = SameSiteMode.Strict;
-        options.Cookie.HttpOnly = true; //The cookie cannot be accessed through JS (protects against XSS)
+        options.Cookie.HttpOnly = true; // The cookie cannot be accessed through JS (protects against XSS)
         options.Cookie.MaxAge = new TimeSpan(7, 0, 0, 0); // cookie expires in a week regardless of activity
         options.SlidingExpiration = true; // extend the cookie lifetime with activity up to 7 days.
         options.ExpireTimeSpan = new TimeSpan(24, 0, 0); // Cookie will expire in 24 hours without activity
@@ -38,7 +50,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
 
 builder.Services.AddIdentityCore<IdentityUser>(config =>
             {
-                //for demonstration only - change these for other projects
+                // For demonstration only - change these for other projects
                 config.Password.RequireDigit = false;
                 config.Password.RequiredLength = 8;
                 config.Password.RequireLowercase = false;
@@ -46,15 +58,14 @@ builder.Services.AddIdentityCore<IdentityUser>(config =>
                 config.Password.RequireUppercase = false;
                 config.User.RequireUniqueEmail = true;
             })
-    .AddRoles<IdentityRole>()  //add the role service.  
+    .AddRoles<IdentityRole>()  // Add the role service.
     .AddEntityFrameworkStores<PersonalLibraryDbContext>();
 
-// allows passing datetimes without time zone data 
+// Allows passing DateTimes without time zone data
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
-// allows our api endpoints to access the database through Entity Framework Core
+// Allows our API endpoints to access the database through Entity Framework Core
 builder.Services.AddNpgsql<PersonalLibraryDbContext>(builder.Configuration["PersonalLibraryDbConnectionString"]);
-
 
 var app = builder.Build();
 
@@ -66,7 +77,11 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-// these two calls are required to add auth to the pipeline for a request
+
+// Enable CORS before Authentication/Authorization
+app.UseCors("AllowFrontendOrigin");
+
+// These two calls are required to add auth to the pipeline for a request
 app.UseAuthentication();
 app.UseAuthorization();
 

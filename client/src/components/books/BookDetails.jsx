@@ -48,6 +48,8 @@ export const BookDetails = () => {
 
   return (
     <div className="book-details-container">
+      <img src={book.imageUrl} alt={book.title} />
+
       <h2>{book.title}</h2>
       <p>
         <strong>Genre:</strong> {book.genreName}

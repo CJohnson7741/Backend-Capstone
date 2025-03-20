@@ -67,7 +67,7 @@ export const Library = ({ loggedInUser }) => {
 
   // Render the component
   return (
-    <div className="library-container w-screen">
+    <div className="library-container w-screen mt-5">
       <h2>Your Library</h2>
 
       {/* Search bar */}

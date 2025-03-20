@@ -92,9 +92,9 @@ namespace PersonalLibrary.Data
             modelBuilder
                 .Entity<Author>()
                 .HasData(
-                    new Author { Id = 1, Name = "Isaac Asimov"},
-                    new Author { Id = 2, Name = "J.K. Rowling"},
-                    new Author { Id = 3, Name = "Agatha Christie"}
+                    new Author { Id = 1, Name = "Isaac Asimov" },
+                    new Author { Id = 2, Name = "J.K. Rowling" },
+                    new Author { Id = 3, Name = "Agatha Christie" }
                 );
 
             // ----------------------------
@@ -111,7 +111,8 @@ namespace PersonalLibrary.Data
                         GenreId = 1,
                         UserProfileId = 1,
                         Description = "A science fiction novel about the fall of the Galactic Empire.",
-                        Condition = "New"
+                        Condition = "New",
+                        ImageUrl = "" // Blank ImageUrl for now
                     },
                     new Book
                     {
@@ -121,7 +122,8 @@ namespace PersonalLibrary.Data
                         GenreId = 2,
                         UserProfileId = 1,
                         Description = "A young wizard's journey begins at Hogwarts School of Witchcraft and Wizardry.",
-                        Condition = "Good"
+                        Condition = "Good",
+                        ImageUrl = "" // Blank ImageUrl for now
                     },
                     new Book
                     {
@@ -131,7 +133,8 @@ namespace PersonalLibrary.Data
                         GenreId = 3,
                         UserProfileId = 1,
                         Description = "A detective story featuring Hercule Poirot solving a murder mystery on a train.",
-                        Condition = "Worn"
+                        Condition = "Worn",
+                        ImageUrl = "" // Blank ImageUrl for now
                     },
                     new Book
                     {
@@ -141,7 +144,8 @@ namespace PersonalLibrary.Data
                         GenreId = 2,
                         UserProfileId = 2,
                         Description = "A fantasy novel about a hobbit's adventures in Middle-earth.",
-                        Condition = "Fair"
+                        Condition = "Fair",
+                        ImageUrl = "" // Blank ImageUrl for now
                     }
                 );
 
@@ -161,5 +165,6 @@ namespace PersonalLibrary.Data
                     new BookAuthor { BookId = 4, AuthorId = 2 } // Adding author for the new book by second user
                 );
         }
+
     }
 }
