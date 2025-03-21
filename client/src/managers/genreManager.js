@@ -5,6 +5,7 @@ export const fetchGenres = async () => {
   try {
     const response = await fetch(`${_apiUrl}/genres`, {
       method: "GET",
+      credentials: "same-origin",
       headers: {
         "Content-Type": "application/json",
       },
@@ -22,10 +23,13 @@ export const fetchGenres = async () => {
   }
 };
 
+// Add a new genre to the API
 export const addGenre = async (newGenre) => {
   try {
-    const response = await fetch(_apiUrl, {
+    const response = await fetch(`${_apiUrl}/add`, {
+      // Updated to match the new endpoint
       method: "POST",
+      credentials: "same-origin",
       headers: {
         "Content-Type": "application/json",
       },
@@ -36,8 +40,8 @@ export const addGenre = async (newGenre) => {
       throw new Error("Failed to add genre.");
     }
 
-    const createdGenre = await response.json(); //Parse the response as JSON
-    return createdGenre; //Return the created genre
+    const createdGenre = await response.json(); // Parse the response as JSON
+    return createdGenre; // Return the created genre
   } catch (error) {
     console.error("Error adding genre:", error);
     throw error;

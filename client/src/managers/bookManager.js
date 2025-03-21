@@ -93,22 +93,34 @@ export const updateBook = async (bookId, updatedBook) => {
 
 export const createBook = async (bookData) => {
   try {
+    debugger;
     const response = await fetch("/api/books", {
       method: "POST",
-      credentials: "same-origin",
+      credentials: "same-origin", // Ensure cookies are sent along with the request
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify(bookData),
     });
 
-    if (response.ok) {
-      return await response.json();
-    } else {
-      throw new Error("Failed to create book");
+    if (!response.ok) {
+      // Log the response details to understand the error
+      const errorData = await response.json(); // Try to parse the error response as JSON
+      console.error("Error response:", errorData);
+
+      // You can also log the status code for debugging
+      console.error(`Failed to create book. Status: ${response.status}`);
+
+      throw new Error(errorData.message || "Failed to create book");
     }
+
+    return await response.json(); // Return the created book data if successful
   } catch (error) {
+    debugger;
+    // Log the error for debugging
     console.error("Error creating book:", error);
+
+    // Rethrow the error for further handling in the UI
     throw error;
   }
 };

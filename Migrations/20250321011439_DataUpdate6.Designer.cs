@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using PersonalLibrary.Data;
@@ -11,9 +12,11 @@ using PersonalLibrary.Data;
 namespace PersonalLibrary.Migrations
 {
     [DbContext(typeof(PersonalLibraryDbContext))]
-    partial class PersonalLibraryDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250321011439_DataUpdate6")]
+    partial class DataUpdate6
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -141,13 +144,13 @@ namespace PersonalLibrary.Migrations
                         {
                             Id = "1",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "98588837-5163-479e-bb1d-c7629abe35e6",
+                            ConcurrencyStamp = "6b3ef772-a35d-4e93-a054-ee8ec4a2ed4e",
                             Email = "admin@library.com",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
-                            PasswordHash = "AQAAAAIAAYagAAAAENqXwX1hp3Ip9HDUIXtKyXWo8Tf94jjow8rG0cGYgpUJUG/9V8cQ1n66T5yRbzu6QQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEGmZG1Ddj3r4exdKUA3ev1QTQ5pwHl5HO5WDCEk6bkYbe/qJ+6CO3B8kWpTXyrPXng==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "c0d1776b-bdd3-47ad-88c2-ca1a389e126c",
+                            SecurityStamp = "9a8124dd-ed66-4117-b8bf-5e39666f9858",
                             TwoFactorEnabled = false,
                             UserName = "adminuser"
                         },
@@ -155,13 +158,13 @@ namespace PersonalLibrary.Migrations
                         {
                             Id = "2",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "a5a20920-a563-47ef-8dd1-f325e3cd0b61",
+                            ConcurrencyStamp = "22fc38e2-ac2f-4b4b-9a6b-17a981fc50f4",
                             Email = "user2@library.com",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
-                            PasswordHash = "AQAAAAIAAYagAAAAEBn0P+TXvBFshPDVga0Oa91jPdzd/qIi5QAFKDR3CLTC/fY7MXyJTpJHKSwIa09oXQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEKvLs4uakt95jS3y2Xy1K4DLOD32bJR3C1iotOLCpYyhD5PMsCT905zJsa1pxw0ltQ==",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "317f747f-442e-4cef-bc57-30826d3bd11e",
+                            SecurityStamp = "f5885c7b-6629-4621-a257-81adb5964cd9",
                             TwoFactorEnabled = false,
                             UserName = "user2"
                         });

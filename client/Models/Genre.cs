@@ -1,9 +1,11 @@
-namespace PersonalLibrary.Models;
-
-public class Genre
+namespace PersonalLibrary.Models
 {
-    public int Id { get; set; }
-    public string Name { get; set; }
+    public class Genre
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
 
-    public ICollection<Book> Books { get; set; }
+        // Many-to-many relationship with Book
+        public ICollection<BookGenre> BookGenres { get; set; }
+    }
 }

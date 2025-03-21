@@ -14,6 +14,7 @@ namespace PersonalLibrary.Data
         public DbSet<Book> Books { get; set; }
         public DbSet<Author> Authors { get; set; }
         public DbSet<BookAuthor> BookAuthors { get; set; }
+        public DbSet<BookGenre> BookGenres { get; set; }  // Added for many-to-many relationship
 
         public PersonalLibraryDbContext(DbContextOptions<PersonalLibraryDbContext> context, IConfiguration config)
             : base(context)
@@ -21,13 +22,26 @@ namespace PersonalLibrary.Data
             _configuration = config;
         }
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
+       protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
-            // ----------------------------
-            // SEED DATA FOR IDENTITY USERS
-            // ----------------------------
+            // Composite primary key for BookGenre
+            modelBuilder.Entity<BookGenre>()
+                .HasKey(bg => new { bg.BookId, bg.GenreId });
+
+            // Optional: You can also configure relationships explicitly if needed
+            modelBuilder.Entity<BookGenre>()
+                .HasOne(bg => bg.Book)
+                .WithMany(b => b.BookGenres)
+                .HasForeignKey(bg => bg.BookId);
+
+            modelBuilder.Entity<BookGenre>()
+                .HasOne(bg => bg.Genre)
+                .WithMany(g => g.BookGenres)
+                .HasForeignKey(bg => bg.GenreId);
+
+            // ---------------------------- SEED DATA FOR IDENTITY USERS ----------------------------
             modelBuilder
                 .Entity<IdentityUser>()
                 .HasData(
@@ -53,9 +67,7 @@ namespace PersonalLibrary.Data
                     }
                 );
 
-            // ----------------------------
-            // SEED DATA FOR UserProfiles
-            // ----------------------------
+            // ---------------------------- SEED DATA FOR UserProfiles ----------------------------
             modelBuilder
                 .Entity<UserProfile>()
                 .HasData(
@@ -75,9 +87,7 @@ namespace PersonalLibrary.Data
                     }
                 );
 
-            // ----------------------------
-            // SEED DATA FOR GENRES
-            // ----------------------------
+            // ---------------------------- SEED DATA FOR GENRES ----------------------------
             modelBuilder
                 .Entity<Genre>()
                 .HasData(
@@ -86,9 +96,7 @@ namespace PersonalLibrary.Data
                     new Genre { Id = 3, Name = "Mystery" }
                 );
 
-            // ----------------------------
-            // SEED DATA FOR AUTHORS
-            // ----------------------------
+            // ---------------------------- SEED DATA FOR AUTHORS ----------------------------
             modelBuilder
                 .Entity<Author>()
                 .HasData(
@@ -97,9 +105,7 @@ namespace PersonalLibrary.Data
                     new Author { Id = 3, Name = "Agatha Christie" }
                 );
 
-            // ----------------------------
-            // SEED DATA FOR BOOKS
-            // ----------------------------
+            // ---------------------------- SEED DATA FOR BOOKS ----------------------------
             modelBuilder
                 .Entity<Book>()
                 .HasData(
@@ -108,7 +114,6 @@ namespace PersonalLibrary.Data
                         Id = 1,
                         Title = "Foundation",
                         ISBN = "978-0-553-80371-0",
-                        GenreId = 1,
                         UserProfileId = 1,
                         Description = "A science fiction novel about the fall of the Galactic Empire.",
                         Condition = "New",
@@ -119,7 +124,6 @@ namespace PersonalLibrary.Data
                         Id = 2,
                         Title = "Harry Potter and the Sorcerer's Stone",
                         ISBN = "978-0-590-35340-3",
-                        GenreId = 2,
                         UserProfileId = 1,
                         Description = "A young wizard's journey begins at Hogwarts School of Witchcraft and Wizardry.",
                         Condition = "Good",
@@ -130,7 +134,6 @@ namespace PersonalLibrary.Data
                         Id = 3,
                         Title = "Murder on the Orient Express",
                         ISBN = "978-0-06-269366-2",
-                        GenreId = 3,
                         UserProfileId = 1,
                         Description = "A detective story featuring Hercule Poirot solving a murder mystery on a train.",
                         Condition = "Worn",
@@ -141,7 +144,6 @@ namespace PersonalLibrary.Data
                         Id = 4,
                         Title = "The Hobbit",
                         ISBN = "978-0-618-00221-3",
-                        GenreId = 2,
                         UserProfileId = 2,
                         Description = "A fantasy novel about a hobbit's adventures in Middle-earth.",
                         Condition = "Fair",
@@ -149,9 +151,16 @@ namespace PersonalLibrary.Data
                     }
                 );
 
-            // ----------------------------
-            // SEED DATA FOR BOOKAUTHORS
-            // ----------------------------
+            // ---------------------------- SEED DATA FOR BOOKGENRES (Many-to-many relationship) ----------------------------
+            modelBuilder.Entity<BookGenre>().HasData(
+                new BookGenre { BookId = 1, GenreId = 1 }, // "Foundation" book, "Science Fiction" genre
+                new BookGenre { BookId = 1, GenreId = 3 }, // "Foundation" book, "Mystery" genre
+                new BookGenre { BookId = 2, GenreId = 2 }, // "Harry Potter", "Fantasy" genre
+                new BookGenre { BookId = 3, GenreId = 3 }, // "Murder on the Orient Express", "Mystery" genre
+                new BookGenre { BookId = 4, GenreId = 2 }  // "The Hobbit", "Fantasy" genre
+            );
+
+            // ---------------------------- SEED DATA FOR BOOKAUTHORS ----------------------------
             modelBuilder
                 .Entity<BookAuthor>()
                 .HasKey(ba => new { ba.BookId, ba.AuthorId }); // Define composite key for BookAuthor

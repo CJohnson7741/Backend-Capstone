@@ -1,0 +1,42 @@
+/* BookCard CSS */
+.book-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Center horizontally */
+  justify-content: flex-start; /* Align content from the top */
+  text-align: center;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  margin: 10px;
+  width: 100%; /* Let the card width scale inside its container */
+  height: auto; /* Allow height to adjust based on content */
+}
+
+.book-image {
+  width: 100%; /* Ensure the image spans the full width of the card */
+  height: 200px; /* Set a height for the image */
+  object-fit: cover; /* Maintain the image aspect ratio and cover the area */
+  margin-bottom: 10px; /* Add space between image and other content */
+}
+
+.book-title {
+  font-size: 1.2em;
+  margin: 10px 0;
+}
+
+.details-button,
+.delete-button {
+  margin-top: auto; /* Push buttons to the bottom */
+  padding: 8px 16px;
+  cursor: pointer;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+}
+
+.details-button:hover,
+.delete-button:hover {
+  background-color: #0056b3;
+}

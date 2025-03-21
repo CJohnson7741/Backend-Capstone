@@ -57,7 +57,7 @@ namespace PersonalLibrary.Controllers
                     // If an AuthorId is provided, check if the author exists in the database
                     author = await _context.Authors
                         .FirstOrDefaultAsync(a => a.Id == authorDto.Id);
-                    
+
                     if (author == null)
                     {
                         return NotFound($"Author with Id {authorDto.Id} not found.");
@@ -89,7 +89,6 @@ namespace PersonalLibrary.Controllers
             {
                 Title = bookDto.Title,
                 ISBN = bookDto.ISBN,
-                GenreId = bookDto.GenreId,
                 UserProfileId = userProfile.Id,
                 Description = bookDto.Description,
                 Condition = bookDto.Condition,
@@ -111,10 +110,64 @@ namespace PersonalLibrary.Controllers
                 _context.BookAuthors.Add(bookAuthor);
             }
 
-            await _context.SaveChangesAsync(); // Save the relationships
+            // Handle many-to-many relationship with genres
+            var genres = new List<Genre>();
+
+            // Check and add genres based on GenreIds
+            foreach (var genreId in bookDto.GenreIds)
+            {
+                var genre = await _context.Genres
+                    .FirstOrDefaultAsync(g => g.Id == genreId);
+
+                if (genre == null)
+                {
+                  genres.Add(genre);  
+                  //return NotFound($"Genre with Id {genreId} not found.");
+                }
+
+                
+            }
+
+            // Check if a new genre name is provided (GenreName is for a single new genre name)
+            if (!string.IsNullOrEmpty(bookDto.GenreName))
+            {
+                var genre = await _context.Genres
+                    .FirstOrDefaultAsync(g => g.Name.Equals(bookDto.GenreName, StringComparison.OrdinalIgnoreCase));
+
+                if (genre == null)
+                {
+                    // Create the new genre if it doesn't exist
+                    genre = new Genre
+                    {
+                        Name = bookDto.GenreName
+                    };
+
+                    // Add the new genre to the database
+                    _context.Genres.Add(genre);
+                    await _context.SaveChangesAsync(); // Save to get the genre's Id
+
+                    genres.Add(genre);
+                }
+            }
+
+            // Now create the relationships in the BookGenres table
+            foreach (var genre in genres)
+            {
+                var bookGenre = new BookGenre
+                {
+                    BookId = book.Id,
+                    GenreId = genre.Id
+                };
+
+                _context.BookGenres.Add(bookGenre);
+            }
+
+            await _context.SaveChangesAsync(); // Save all the relationships
 
             return CreatedAtAction(nameof(GetBook), new { id = book.Id }, book);
         }
+
+
 
         // PUT /api/books/{id}
         [HttpPut("{id}")]
@@ -147,6 +200,7 @@ namespace PersonalLibrary.Controllers
 
                 var book = await _context.Books
                     .Where(b => b.UserProfileId == userProfile.Id && b.Id == id)
+                    .Include(b => b.BookGenres)  // Include BookGenres to manage the genre updates
                     .FirstOrDefaultAsync();
 
                 if (book == null)
@@ -197,14 +251,56 @@ namespace PersonalLibrary.Controllers
                 book.Description = bookDto.Description;
                 book.Condition = bookDto.Condition;
                 book.ISBN = bookDto.ISBN;
-                book.GenreId = bookDto.GenreId;
 
-                // Get the current book authors in the database
+                // Handle many-to-many relationship with genres
+                var genres = new List<Genre>();
+                foreach (var genreId in bookDto.GenreIds ?? new List<int>())
+                {
+                    var genre = await _context.Genres
+                        .FirstOrDefaultAsync(g => g.Id == genreId);
+
+                    if (genre == null)
+                    {
+                        return NotFound($"Genre with Id {genreId} not found.");
+                    }
+
+                    genres.Add(genre);
+                }
+
+                // Get the current book genres in the database
+                var existingBookGenres = await _context.BookGenres
+                    .Where(bg => bg.BookId == book.Id)
+                    .ToListAsync();
+
+                // Determine genres to remove and add
+                var genresToRemove = existingBookGenres
+                    .Where(bg => !genres.Any(g => g.Id == bg.GenreId))
+                    .ToList();
+
+                var genresToAdd = genres
+                    .Where(g => !existingBookGenres.Any(bg => bg.GenreId == g.Id))
+                    .ToList();
+
+                // Remove the genres that are no longer associated with the book
+                _context.BookGenres.RemoveRange(genresToRemove);
+
+                // Add new genre relationships
+                foreach (var genre in genresToAdd)
+                {
+                    var bookGenre = new BookGenre
+                    {
+                        BookId = book.Id,
+                        GenreId = genre.Id
+                    };
+
+                    _context.BookGenres.Add(bookGenre);
+                }
+
+                // Handle updating authors
                 var existingBookAuthors = await _context.BookAuthors
                     .Where(ba => ba.BookId == book.Id)
                     .ToListAsync();
 
-                // Determine authors to remove and add
                 var authorsToRemove = existingBookAuthors
                     .Where(ba => !authors.Any(a => a.Id == ba.AuthorId))
                     .ToList();
@@ -240,6 +336,7 @@ namespace PersonalLibrary.Controllers
                 return StatusCode(500, "An error occurred while updating the book.");
             }
         }
+
 
         // DELETE /api/books/{id}
         [HttpDelete("{id}")]
@@ -297,36 +394,38 @@ namespace PersonalLibrary.Controllers
 
             var book = await _context.Books
                 .Where(b => b.UserProfileId == userProfile.Id && b.Id == id)
-                .FirstOrDefaultAsync();
+                .Include(b => b.BookGenres)  // Include the BookGenres relationship
+                    .ThenInclude(bg => bg.Genre)  // Include the Genre for each BookGenre
+                .Include(b => b.BookAuthors)  // Include BookAuthors to load related authors
+                    .ThenInclude(ba => ba.Author)  // Include the Author for each BookAuthor
+                .FirstOrDefaultAsync();  // Get the book with its related entities
 
             if (book == null)
             {
                 return NotFound("Book not found.");
             }
 
-            var authors = await _context.BookAuthors
-                .Where(ba => ba.BookId == book.Id)
-                .Select(ba => ba.Author)
-                .ToListAsync();
+            var authors = book.BookAuthors
+                .Select(ba => new AuthorDTO { Id = ba.Author.Id, Name = ba.Author.Name })
+                .ToList();
 
-            var genre = await _context.Genres
-                .FirstOrDefaultAsync(g => g.Id == book.GenreId);
+            var genreNames = string.Join(", ", book.BookGenres.Select(bg => bg.Genre.Name));  // Join genre names as a string
 
             var bookDto = new BookDTO
             {
                 Id = book.Id,
                 Title = book.Title,
                 ISBN = book.ISBN,
-                GenreId = book.GenreId,
-                GenreName = genre?.Name, // Ensure the GenreName is included
+                GenreName = genreNames,  // Set the GenreNames as a comma-separated string
                 Description = book.Description,
                 Condition = book.Condition,
-                Authors = authors.Select(a => new AuthorDTO { Id = a.Id, Name = a.Name }).ToList(),
-                ImageUrl = book.ImageUrl // Include image URL in response
+                Authors = authors,
+                ImageUrl = book.ImageUrl  // Include image URL in response
             };
 
             return Ok(bookDto);
         }
+
 
         // GET /api/books
         [HttpGet]
@@ -350,29 +449,32 @@ namespace PersonalLibrary.Controllers
 
             var books = await _context.Books
                 .Where(b => b.UserProfileId == userProfile.Id)
-                .Include(b => b.Genre) // Ensure the Genre is included in the query
+                .Include(b => b.BookGenres)  // Include BookGenres for the many-to-many relationship
+                    .ThenInclude(bg => bg.Genre)  // Include the Genre details related to each BookGenre
+                .Include(b => b.BookAuthors)  // Include BookAuthors to load related authors
+                    .ThenInclude(ba => ba.Author)  // Load the authors related to the book
                 .Select(b => new BookDTO
                 {
                     Id = b.Id,
                     Title = b.Title,
                     ISBN = b.ISBN,
-                    GenreId = b.GenreId,
-                    GenreName = b.Genre.Name,  // Map Genre Name here
+                    GenreName = string.Join(", ", b.BookGenres.Select(bg => bg.Genre.Name)),  // Get Genre names from BookGenres
                     Description = b.Description,
                     Condition = b.Condition,
                     Authors = b.BookAuthors
-                        .Select(ba => ba.Author)
-                        .Select(a => new AuthorDTO
+                        .Select(ba => new AuthorDTO
                         {
-                            Id = a.Id,
-                            Name = a.Name,
-                        }).ToList(),
-                    ImageUrl = b.ImageUrl // Include image URL in the response
+                            Id = ba.Author.Id,
+                            Name = ba.Author.Name,
+                        })
+                        .ToList(),
+                    ImageUrl = b.ImageUrl  // Include image URL in the response
                 })
                 .ToListAsync();
 
             return Ok(books);
         }
+
 
         [HttpGet("isbn/{isbn}")]
         public async Task<IActionResult> GetBookByISBN(string isbn)
@@ -431,5 +533,3 @@ namespace PersonalLibrary.Controllers
         }
     }
 }
-
-

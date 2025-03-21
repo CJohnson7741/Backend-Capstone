@@ -1,14 +1,14 @@
-namespace PersonalLibrary.Models.DTOs;
-
+namespace PersonalLibrary.Models.DTOs
+{
     public class BookDTO
     {
         public int Id { get; set; }
         public string Title { get; set; }
         public string ISBN { get; set; }
-        public int GenreId { get; set; }
-        public string GenreName { get; set; }
+        public List<int> GenreIds { get; set; }  // Updated to be a list of GenreIds
+        public string GenreName { get; set; }  // Optional, but can still be used for displaying genre names if needed
         public int UserProfileId { get; set; }
-        // public string Username { get; set; }
+
         public List<AuthorDTO> Authors { get; set; }
 
         public string Description { get; set; }
@@ -16,3 +16,4 @@ namespace PersonalLibrary.Models.DTOs;
 
         public string ImageUrl { get; set; }
     }
+}

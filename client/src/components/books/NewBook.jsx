@@ -11,16 +11,15 @@ export const NewBook = () => {
     description: "",
     condition: "New",
     isbn: "",
-    genreId: 1,
+    genreIds: [], // Now an array to handle multiple genres
     authors: [],
-    imageUrl: "", // Add imageUrl field
+    imageUrl: "",
   });
   const [genres, setGenres] = useState([]);
   const [authorInput, setAuthorInput] = useState("");
   const [authorsList, setAuthorsList] = useState([]);
 
   useEffect(() => {
-    // Load the genres
     const loadGenres = async () => {
       try {
         const genreData = await fetchGenres();
@@ -81,21 +80,41 @@ export const NewBook = () => {
             ? bookData.imageLinks.thumbnail
             : null;
 
+          // Map Google Categories to GenreIds
+          const newGenres = bookData.categories
+            ? bookData.categories.map((category) => {
+                const genre = genres.find((g) => g.name === category);
+                // If the genre doesn't exist, add it to the list dynamically
+                if (!genre) {
+                  const newGenre = {
+                    id: genres.length + 1, // You can generate the ID however needed
+                    name: category,
+                  };
+                  setGenres((prevGenres) => [...prevGenres, newGenre]); // Add new genre to list
+                  return newGenre.id; // Assign the new genre's ID
+                }
+                return genre.id; // If genre exists, use its ID
+              })
+            : [];
+
           // Populate the form with the fetched data
           setBook({
             ...book,
             title: bookData.title,
             description: bookData.description,
-            condition: "New", // Set default condition
+            condition: "New",
             isbn: isbn,
+            genreIds: newGenres, // Set genreIds based on Google Categories
           });
 
           // Set authors list
           setAuthorsList(
-            bookData.authors.map((author) => ({
-              Id: 0, // Default ID for authors from Google Books API
-              Name: author,
-            }))
+            bookData.authors
+              ? bookData.authors.map((author) => ({
+                  Id: 0, // Default ID for authors from Google Books API
+                  Name: author,
+                }))
+              : []
           );
 
           // Set the image URL if available
@@ -127,12 +146,19 @@ export const NewBook = () => {
 
     if (isConfirmed) {
       try {
-        const selectedGenre = genres.find((genre) => genre.id === book.genreId);
+        // Get genre names based on the selected genre IDs
+        const genreNames = book.genreIds.map((genreId) => {
+          const genre = genres.find((g) => g.id === genreId);
+          return genre ? genre.name : null;
+        });
+
+        // Send the updated book object to the backend, passing both genreIds and genreNames
         const newBook = await createBook({
           ...book,
-          genreName: selectedGenre ? selectedGenre.name : "",
           authors: authorsList,
-          imageUrl: book.imageUrl, // Include imageUrl when creating the book
+          imageUrl: book.imageUrl,
+          genreIds: book.genreIds,
+          genreName: genreNames[0], // Add genreNames to the payload
         });
 
         if (newBook) {
@@ -210,24 +236,37 @@ export const NewBook = () => {
         </div>
 
         <div>
-          <label htmlFor="genreId">Genre</label>
-          <select
-            id="genreId"
-            name="genreId"
-            value={book.genreId}
-            onChange={handleInputChange}
-            required
-          >
+          <label htmlFor="genreIds">Genres</label>
+          <div>
             {genres.length > 0 ? (
               genres.map((genre) => (
-                <option key={genre.id} value={genre.id}>
-                  {genre.name}
-                </option>
+                <div key={genre.id}>
+                  <label>
+                    <input
+                      type="checkbox"
+                      name="genreIds"
+                      value={genre.id}
+                      checked={book.genreIds.includes(genre.id)}
+                      onChange={(e) => {
+                        const selectedGenreId = parseInt(e.target.value);
+                        setBook((prevBook) => ({
+                          ...prevBook,
+                          genreIds: e.target.checked
+                            ? [...prevBook.genreIds, selectedGenreId]
+                            : prevBook.genreIds.filter(
+                                (id) => id !== selectedGenreId
+                              ),
+                        }));
+                      }}
+                    />
+                    {genre.name}
+                  </label>
+                </div>
               ))
             ) : (
-              <option value="">Loading genres...</option>
+              <p>Loading genres...</p>
             )}
-          </select>
+          </div>
         </div>
 
         {/* Image Section */}
