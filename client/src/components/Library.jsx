@@ -1,4 +1,3 @@
-// Library.js
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { fetchBooks, deleteBook } from "../managers/bookManager";
@@ -59,9 +58,14 @@ export const Library = ({ loggedInUser }) => {
     const query = event.target.value;
     setSearchQuery(query);
 
-    // Filter books based on title or any other property you prefer
-    const filtered = books.filter((book) =>
-      book.title.toLowerCase().includes(query.toLowerCase())
+    // Filter books based on title, genre, or authors
+    const filtered = books.filter(
+      (book) =>
+        book.title.toLowerCase().includes(query.toLowerCase()) || // Search by title
+        book.genreName.toLowerCase().includes(query.toLowerCase()) || // Search by genre
+        book.authors.some(
+          (author) => author.name.toLowerCase().includes(query.toLowerCase()) // Search by author name
+        )
     );
     setFilteredBooks(filtered);
   };
@@ -76,7 +80,7 @@ export const Library = ({ loggedInUser }) => {
         <input
           type="text"
           className="search-bar"
-          placeholder="Search books..."
+          placeholder="Search by title, genre, or author..."
           value={searchQuery}
           onChange={handleSearchChange}
         />
@@ -90,15 +94,13 @@ export const Library = ({ loggedInUser }) => {
       {filteredBooks.length === 0 ? (
         <p>No books found for your search!</p>
       ) : (
-        // <div className="book-cards-container">
         <>
           {filteredBooks.map((book) => (
-            <Row className="my-2">
-              <BookCard key={book.id} book={book} onDelete={handleDeleteBook} />
+            <Row className="my-2" key={book.id}>
+              <BookCard book={book} onDelete={handleDeleteBook} />
             </Row>
           ))}
         </>
-        // </div>
       )}
     </div>
   );
