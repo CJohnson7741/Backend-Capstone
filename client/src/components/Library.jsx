@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { fetchBooks, deleteBook } from "../managers/bookManager";
 import { BookCard } from "./books/bookCard";
 import "./Library.css";
+import "./books/BookCard.css";
 import { Row } from "reactstrap";
 
 export const Library = ({ loggedInUser }) => {

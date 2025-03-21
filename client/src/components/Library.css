@@ -1,18 +1,29 @@
-/* Library.css */
+/* Apply a background to the entire page */
+body {
+  background-color: #8b5d3b; /* Warm brown background for the page */
+  margin: 0;
+  font-family: Arial, sans-serif; /* Clean font */
+}
+
+/* Library container with a soft light background */
 .library-container {
   padding: 20px;
-  /* max-width: 1200px; */
   margin: 0 auto;
+  background-color: #f4e1d2; /* Soft warm background */
+  border-radius: 10px; /* Optional: rounded corners for the container */
+  max-width: 1200px; /* Limit the container width */
 }
 
+/* Cards container with a flexible layout */
 .book-cards-container {
   display: flex;
-  flex-wrap: nowrap; /* Prevent cards from wrapping to the next row */
-  gap: 20px; /* Space between cards */
-  overflow-x: auto; /* Enable horizontal scrolling */
-  padding-bottom: 20px; /* Space at the bottom of the cards */
+  flex-wrap: wrap;
+  gap: 20px;
+  overflow-x: auto;
+  padding-bottom: 20px;
 }
 
+/* Individual book cards */
 .book-card {
   background-color: #fff;
   border: 1px solid #ddd;
@@ -21,29 +32,57 @@
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
-  min-width: 250px; /* Fixed width for each card */
-  height: 300px; /* Fixed height for each card */
+  align-items: center;
+  justify-content: flex-start;
+  min-width: 250px;
+  max-width: 300px;
   transition: transform 0.2s, box-shadow 0.2s;
+  height: auto;
 }
 
+/* Hover effect for book cards */
 .book-card:hover {
   transform: scale(1.05);
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
 }
 
+/* Title styling with some margin */
 .book-title {
   font-size: 1.5em;
   margin-bottom: 10px;
+  color: #333; /* Dark text for better contrast */
 }
 
+/* Paragraphs inside book card for genre, author, etc. */
 .book-card p {
   margin: 5px 0;
+  color: #666; /* Lighter color for less important text */
 }
 
+/* Strong text for highlighting labels */
 .book-card strong {
   color: #333;
 }
 
+/* Styling for the buttons at the bottom of the book card */
+.details-button,
+.delete-button {
+  margin-top: auto;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+/* Hover effect for buttons */
+.details-button:hover,
+.delete-button:hover {
+  background-color: #0056b3;
+  color: white;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Styling for New Book Button */
 .new-book-button {
   background-color: #4caf50;
   color: white;
@@ -55,35 +94,37 @@
   margin-bottom: 20px;
 }
 
+/* Hover effect for New Book Button */
 .new-book-button:hover {
   background-color: #45a049;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
-.details-button {
-  background-color: #007bff;
-  color: white;
-  padding: 8px 16px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  margin-top: auto; /* This will push the button to the bottom */
-}
-
-.details-button:hover {
-  background-color: #0056b3;
-}
-
-/* Library.css */
-.delete-button {
-  background-color: #f44336;
-  color: white;
-  padding: 8px 16px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
+/* Add some spacing around the buttons */
+.details-button,
+.delete-button,
+.new-book-button {
   margin-top: 10px;
 }
 
-.delete-button:hover {
-  background-color: #d32f2f;
+/* Ensure the cards and buttons have enough spacing */
+.book-card img {
+  margin-bottom: 15px; /* Add margin to the bottom of the image for spacing */
+}
+
+/* Optional: Add a subtle animation to the book cards */
+@keyframes card-entry {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Apply animation to book cards */
+.book-card {
+  animation: card-entry 0.3s ease-out;
 }

@@ -5,9 +5,10 @@
   max-width: 900px;
   margin: 50px auto;
   padding: 20px;
-  background-color: #fff;
+  background-color: #f4e1d2; /* Warm brown background */
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  color: #000; /* Set text color to black for better contrast */
 }
 
 .new-book-container h2 {
