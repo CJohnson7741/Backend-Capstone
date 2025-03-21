@@ -4,7 +4,7 @@ import { fetchBooks, deleteBook } from "../managers/bookManager";
 import { BookCard } from "./books/bookCard";
 import "./Library.css";
 import "./books/BookCard.css";
-import { Row } from "reactstrap";
+import { Row, Col } from "reactstrap"; // Add Col from reactstrap for grid layout
 
 export const Library = ({ loggedInUser }) => {
   const [books, setBooks] = useState([]); // Holds all books
@@ -94,13 +94,18 @@ export const Library = ({ loggedInUser }) => {
       {filteredBooks.length === 0 ? (
         <p>No books found for your search!</p>
       ) : (
-        <>
+        <div className="book-cards-container">
+          {/* Loop through filtered books and display them in a row */}
           {filteredBooks.map((book) => (
             <Row className="my-2" key={book.id}>
-              <BookCard book={book} onDelete={handleDeleteBook} />
+              <Col sm="6" md="4" lg="3">
+                {" "}
+                {/* Column settings for responsiveness */}
+                <BookCard book={book} onDelete={handleDeleteBook} />
+              </Col>
             </Row>
           ))}
-        </>
+        </div>
       )}
     </div>
   );

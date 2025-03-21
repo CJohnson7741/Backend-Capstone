@@ -11,8 +11,21 @@
 
 .book-image {
   max-width: 100%;
-  height: auto;
+  height: 150px; /* Fixed height to ensure consistency */
+  object-fit: cover;
   border-radius: 8px;
+}
+
+.book-image-placeholder {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 150px; /* Match the height of the image */
+  background-color: #f0f0f0; /* Light grey background for placeholder */
+  border-radius: 8px;
+  color: #777; /* Color for the placeholder text */
+  font-size: 24px; /* Font size for the icon */
 }
 
 .book-title {

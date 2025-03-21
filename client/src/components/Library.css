@@ -14,13 +14,13 @@ body {
   max-width: 1200px; /* Limit the container width */
 }
 
-/* Cards container with a flexible layout */
+/* Cards container with a grid layout */
 .book-cards-container {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* Display 2 cards per row */
   gap: 20px;
-  overflow-x: auto;
   padding-bottom: 20px;
+  grid-auto-rows: minmax(300px, auto); /* Make sure the rows grow properly */
 }
 
 /* Individual book cards */
@@ -127,4 +127,11 @@ body {
 /* Apply animation to book cards */
 .book-card {
   animation: card-entry 0.3s ease-out;
+}
+
+/* Media query for smaller screens */
+@media (max-width: 768px) {
+  .book-cards-container {
+    grid-template-columns: 1fr; /* Display 1 card per row on smaller screens */
+  }
 }
