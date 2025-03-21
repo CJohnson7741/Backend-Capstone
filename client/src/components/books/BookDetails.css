@@ -1,49 +1,58 @@
-.condition-selector {
-  margin-top: 20px;
+/* BookDetails.css */
+.book-details-container {
+  padding: 20px;
+  background-color: #f4e1d2; /* Warm brown background */
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
-.condition-selector h3 {
-  font-size: 1.5rem;
-  margin-bottom: 10px;
+.book-details-container h2 {
+  font-size: 2rem;
+  margin-bottom: 20px;
+  color: #000; /* Black text */
 }
 
-.condition-selector label {
-  display: block;
-  font-size: 1rem;
-  margin-bottom: 8px;
+.book-details-container p {
+  font-size: 1.2rem;
+  margin-bottom: 15px;
+  background-color: #fae1d1; /* Lighter brown for background around text */
+  padding: 10px;
+  border-radius: 5px;
+  color: #000; /* Black text */
 }
 
-.update-condition-button {
+.book-details-container p strong {
+  font-weight: bold;
+}
+
+.edit-button,
+.delete-button {
   padding: 10px 20px;
   margin-top: 20px;
+  font-size: 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.edit-button {
   background-color: #3498db;
   color: white;
   border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 1rem;
-  transition: background-color 0.3s;
 }
 
-.update-condition-button:hover {
+.edit-button:hover {
   background-color: #2980b9;
 }
 
-.update-condition-button:active {
+.edit-button:active {
   background-color: #1f6f99;
 }
 
 .delete-button {
-  display: inline-block;
-  padding: 10px 20px;
-  margin-top: 20px;
   background-color: #e74c3c;
   color: white;
   border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 1rem;
-  transition: background-color 0.3s;
 }
 
 .delete-button:hover {

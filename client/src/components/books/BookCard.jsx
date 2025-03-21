@@ -15,6 +15,20 @@ export const BookCard = ({ book, onDelete }) => {
 
   return (
     <div className="book-card">
+      {/* Display the image if it exists */}
+      {book.imageUrl && (
+        <img
+          src={book.imageUrl}
+          alt={book.title}
+          className="book-image"
+          style={{
+            width: "100px",
+            height: "150px",
+            objectFit: "cover",
+          }}
+        />
+      )}
+
       <h3 className="book-title">{book.title}</h3>
       <p>
         <strong>Genre:</strong> {book.genreName}
@@ -29,6 +43,8 @@ export const BookCard = ({ book, onDelete }) => {
         className="details-button"
         onClick={() => navigate(`/book/${book.id}`)}
       >
+        <i className="fas fa-book-open" style={{ marginRight: "8px" }}></i>{" "}
+        {/* Optional icon */}
         View Details
       </button>
 
